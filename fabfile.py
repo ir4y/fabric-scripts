@@ -73,8 +73,8 @@ def create_project(user):
         sudo("psql -c 'create database {0} owner {0}'".format(user))
 
     append("/etc/supervisor/conf.d/{0}_gunicorn.conf".format(user),"""[program:{0}_gunicorn]
-command=python /home/{0}/site/{0}/manage.py run_gunicorn -b 127.0.0.1:9000  --pid /home/{0}/var/run/gunicorn.pid
-directory=/home/{0}/site/{0}
+command=python /home/{0}/sites/{0}/manage.py run_gunicorn -b 127.0.0.1:9000  --pid /home/{0}/var/run/gunicorn.pid
+directory=/home/{0}/sites/{0}
 environment=PATH="/home/{0}/bin",LANG="ru_RU.UTF-8",LC_ALL="ru_RU.UTF-8",LC_LANG="ru_RU.UTF-8"
 user={0}
 autostart=false
