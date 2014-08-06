@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from os import environ, path
 from fabric.api import run, put, sudo, settings, cd
 from fabric.contrib.files import append
@@ -15,6 +17,7 @@ UTILS_PACKAGES = [
     "mercurial",
     "nginx",
     "redis-server",
+    "supervisor",
 ]
 
 PYTHON_PACKAGES = [
@@ -61,10 +64,55 @@ def create_project(user):
             append(".ssh/authorized_keys", rsa_key, use_sudo=True)
             sudo("virtualenv ./")
             append(".bashrc", "source ~/bin/activate", use_sudo=True)
-            sudo("mkdir sites")
+            sudo("mkdir -p sites/{0}".format(user))
             sudo("mkdir -p var/run")
             sudo("mkdir -p var/log")
 
     with settings(sudo_user='postgres'):
         sudo("psql -c 'create user {0}'".format(user))
         sudo("psql -c 'create database {0} owner {0}'".format(user))
+
+    append("/etc/supervisor/conf.d/{0}_gunicorn.conf".format(user),"""[program:{0}_gunicorn]
+command=python /home/{0}/site/{0}/manage.py run_gunicorn -b 127.0.0.1:9000  --pid /home/{0}/var/run/gunicorn.pid
+directory=/home/{0}/site/{0}
+environment=PATH="/home/{0}/bin",LANG="ru_RU.UTF-8",LC_ALL="ru_RU.UTF-8",LC_LANG="ru_RU.UTF-8"
+user={0}
+autostart=false
+autorestart=false
+""".format(user))
+
+    append("/etc/nginx/sites-available/{0}.ru".format(user),"""server {{
+    listen   80;
+    server_name {0}.ru;
+    # no security problem here, since / is alway passed to upstream
+    root /usr/share/nginx/www/{0};
+    # serve directly - analogous for static/staticfiles
+    location /media/ {{
+        # if asset versioning is used
+        if ($query_string) {{
+            expires max;
+        }}
+    }}
+    location /static/ {{
+        # if asset versioning is used
+        if ($query_string) {{
+            expires max;
+        }}
+    }}
+    location / {{
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_connect_timeout 10;
+        proxy_read_timeout 10;
+        proxy_pass http://localhost:9000/;
+    }}
+    # what to serve if upstream is not available or crashes
+    error_page 500 502 503 504 /usr/share/nginx/www/50x.html;
+}}""".format(user))
+
+    run("mkdir -p /usr/share/nginx/www/{0}".format(user))
+    run("ln -s /home/{0}/sites/{0}/media  /usr/share/nginx/www/{0}".format(user))
+    run("ln -s /home/{0}/sites/{0}/static  /usr/share/nginx/www/{0}".format(user))
