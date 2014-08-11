@@ -8,7 +8,7 @@ from fabric.contrib.files import append
 def upload_rsa():
     key_path = path.join(environ['HOME'], ".ssh/id_rsa.pub")
     rsa_key = open(key_path).read()
-    run("mkdir ~/.ssh")
+    run("mkdir -p ~/.ssh")
     run("touch ~/.ssh/authorized_keys")
     append("~/.ssh/authorized_keys", rsa_key)
 
