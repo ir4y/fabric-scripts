@@ -1,8 +1,11 @@
 from __future__ import unicode_literals
 
 from os import environ, path
+
+import string
 from fabric.api import run, sudo, settings, cd
 from fabric.contrib.files import append
+from random import choice
 
 
 def upload_rsa():
@@ -59,8 +62,14 @@ def setup_all():
 
 
 def create_project(user):
-    run("useradd -s /bin/bash -m {0}".format(user))
+    create_user(user)
+    create_database(user)
+    create_gunicorn_supervisor(user)
+    create_nginx_host(user)
 
+
+def create_user(user):
+    run("useradd -s /bin/bash -m {0}".format(user))
     with settings(sudo_user=user):
         with cd("/home/{0}".format(user)):
             key_path = path.join(environ['HOME'], ".ssh/id_rsa.pub")
@@ -74,11 +83,26 @@ def create_project(user):
             sudo("mkdir -p var/run")
             sudo("mkdir -p var/log")
 
-    with settings(sudo_user='postgres'):
-        sudo("psql -c 'create user {0}'".format(user))
-        sudo("psql -c 'create database {0} owner {0}'".format(user))
 
-    append("/etc/supervisor/conf.d/{0}_gunicorn.conf".format(user),
+def generate_password():
+    chars = string.letters + string.digits
+    length = 8
+    return ''.join(choice(chars) for _ in range(length))
+
+
+def create_database(user, use_password=False):
+    with settings(sudo_user='postgres'):
+        password_string = ''
+        if use_password:
+            password = generate_password()
+            print(password)
+            password_string = "WITH PASSWORD '{0}'".format(password)
+        sudo('psql -c "create user {0} {1};"'.format(user, password_string))
+        sudo('psql -c "create database {0} owner {0};"'.format(user))
+
+
+def create_gunicorn_supervisor(app):
+    append("/etc/supervisor/conf.d/{0}_gunicorn.conf".format(app),
            """[program:{0}_gunicorn]
 command=python /home/{0}/sites/{0}/manage.py run_gunicorn -b 127.0.0.1:9000  --pid /home/{0}/var/run/gunicorn.pid
 directory=/home/{0}/sites/{0}
@@ -86,9 +110,11 @@ environment=PATH="/home/{0}/bin",LANG="ru_RU.UTF-8",LC_ALL="ru_RU.UTF-8",LC_LANG
 user={0}
 autostart=false
 autorestart=false
-""".format(user))
+""".format(app))
 
-    append("/etc/nginx/sites-available/{0}.ru".format(user),
+
+def create_nginx_host(host):
+    append("/etc/nginx/sites-available/{0}.ru".format(host),
            """server {{
     listen   80;
     server_name {0}.ru;
@@ -119,8 +145,10 @@ autorestart=false
     }}
     # what to serve if upstream is not available or crashes
     error_page 500 502 503 504 /usr/share/nginx/www/50x.html;
-}}""".format(user))
+}}""".format(host))
 
-    run("mkdir -p /usr/share/nginx/www/{0}".format(user))
-    run("ln -s /home/{0}/sites/{0}/media  /usr/share/nginx/www/{0}".format(user))
-    run("ln -s /home/{0}/sites/{0}/static  /usr/share/nginx/www/{0}".format(user))
+    run("mkdir -p /usr/share/nginx/www/{0}".format(host))
+    run("ln -s /home/{0}/sites/{0}/media  /usr/share/nginx/www/{0}".format(
+        host))
+    run("ln -s /home/{0}/sites/{0}/static  /usr/share/nginx/www/{0}".format(
+        host))
