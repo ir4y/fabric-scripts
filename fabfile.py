@@ -8,12 +8,16 @@ from fabric.contrib.files import append
 from random import choice
 
 
-def upload_rsa():
+def upload_rsa(user=None, use_sudo=False):
     key_path = path.join(environ['HOME'], ".ssh/id_rsa.pub")
     rsa_key = open(key_path).read()
-    run("mkdir -p ~/.ssh")
-    run("touch ~/.ssh/authorized_keys")
-    append("~/.ssh/authorized_keys", rsa_key)
+    home_path = run("echo ~{0}".format(user)) if user else "~"
+    execute = sudo if use_sudo else run
+    execute("mkdir -p {0}/.ssh".format(home_path))
+    execute("touch {0}/.ssh/authorized_keys".format(home_path))
+    append("{0}/.ssh/authorized_keys".format(home_path),
+           rsa_key,
+           use_sudo=use_sudo)
 
 UTILS_PACKAGES = [
     "screen",
@@ -72,11 +76,7 @@ def create_user(user):
     run("useradd -s /bin/bash -m {0}".format(user))
     with settings(sudo_user=user):
         with cd("/home/{0}".format(user)):
-            key_path = path.join(environ['HOME'], ".ssh/id_rsa.pub")
-            rsa_key = open(key_path).read()
-            sudo("mkdir .ssh")
-            sudo("touch .ssh/authorized_keys")
-            append(".ssh/authorized_keys", rsa_key, use_sudo=True)
+            upload_rsa(user=user, use_sudo=True)
             sudo("virtualenv ./")
             append(".bashrc", "source ~/bin/activate", use_sudo=True)
             sudo("mkdir -p sites/{0}".format(user))
