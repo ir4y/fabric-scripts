@@ -11,7 +11,7 @@ TODO
 [\_] Add UNIX socket support for  `create_nginx_host`  
 [\_] Split `create_database` to `create_database_user` and `create_database`  
 [\_] Add `create_site` wich should accept `user` and `git repo` params and deploy repo  
-[\_] Add packet cache for decrease test time (disable downloading) (maybe mount local dir to packet cache dir)
+[\_] Add packet cache for decrease test time (disable downloading) (maybe mount local dir to packet cache dir)  
 [\_] Add tests for all tasks  
 
 Tests
