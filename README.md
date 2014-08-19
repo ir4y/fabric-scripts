@@ -14,6 +14,7 @@ TODO
 [X] ~~Add packet cache for decrease test time (disable downloading) (maybe mount local dir to packet cache dir)~~  
 [\_] Add tests for all tasks  
 [\_] Add travis integration (https://github.com/lukecyca/travis-docker-example)  
+[\_] Use castom Dockerfile with updated ubuntu 14.04  
 
 Tests
 ----- 

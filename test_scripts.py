@@ -1,7 +1,7 @@
 import requests
-from fabric.api import settings, local, run, env
+from fabric.api import settings, local, run, env, sudo
 import paramiko
-from fabfile import setup_utils
+from fabfile import setup_python, setup_postgresql, setup_utils
 
 paramiko.util.log_to_file("ssh.log")
 
@@ -39,8 +39,23 @@ def inside_docker(*ports):
     return wrap
 
 
+@inside_docker()
+def test_python():
+    setup_python()
+    py_version = run("python --version").split(" ")
+    assert py_version[0] == "Python"
+    assert py_version[1][:3] == "2.7"
+
+
+@inside_docker()
+def test_postgres():
+    setup_postgresql()
+    with settings(sudo_user="postgres"):
+        assert 2 == sudo('psql -c "select 1 + 1" -A -t')
+
+
 @inside_docker(80)
-def test_nginx():
+def test_utils():
     setup_utils()
     run("service nginx start")
     url = "http://%(host)s:%(port)s" % {'host': '127.0.0.1',
@@ -48,3 +63,10 @@ def test_nginx():
     page = requests.get(url)
     assert page.status_code == 200
     assert page.content == '<html>\n<head>\n<title>Welcome to nginx!</title>\n</head>\n<body bgcolor="white" text="black">\n<center><h1>Welcome to nginx!</h1></center>\n</body>\n</html>\n'
+
+    run("screen -v")
+    run("git -v")
+    run("hg -v")
+    run("redis-cli set foo bar")
+    assert "bar" == run("redis-cli get foo")
+    run("supervisorctl status")
