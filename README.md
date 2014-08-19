@@ -13,11 +13,12 @@ TODO
 [\_] Add `create_site` wich should accept `user` and `git repo` params and deploy repo  
 [X] ~~Add packet cache for decrease test time (disable downloading) (maybe mount local dir to packet cache dir)~~  
 [\_] Add tests for all tasks  
+[\_] Add travis integration (https://github.com/lukecyca/travis-docker-example)  
 
 Tests
 ----- 
 You need docker.io to run tests.  
-```py.test -s```  
+```py.test -s --cov fabfile.py```  
 It's draft only.
 It's not working yet. 
 Test is starting nginx over docker.io ssh conteiner and check that it started.

@@ -2,3 +2,6 @@ fabfile.pyc
 .ropeproject
 __pycache__/
 ssh.log
+*.swp
+.coverage
+htmlcov/
