@@ -5,3 +5,4 @@ ssh.log
 *.swp
 .coverage
 htmlcov/
+*.pyc

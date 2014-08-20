@@ -1,9 +1,15 @@
+import paramiko
 import requests
 from fabric.api import settings, local, run, env, sudo
-import paramiko
+
 from fabfile import setup_python, setup_postgresql, setup_utils
 
+
 paramiko.util.log_to_file("ssh.log")
+
+
+def build_container():
+    docker("build -t fab-test-ubuntu tests")
 
 
 def docker(cmd):
@@ -13,11 +19,12 @@ def docker(cmd):
 def inside_docker(*ports):
     def wrap(fn):
         def inside(*args, **kwargs):
+            build_container()  # move to setUp
             all_ports = (22, ) + ports
             port_options = " ".join("-p {0}".format(p) for p in all_ports)
             apt_cache = "-v /var/cache/apt/archives:/var/cache/apt/archives"
             container = docker(
-                'run -d {0} {1} dhrp/sshd /usr/sbin/sshd -D'.format(
+                'run -d {0} {1} fab-test-ubuntu /usr/sbin/sshd -D'.format(
                     port_options,
                     apt_cache))
             get_port = lambda p: docker('port {0} {1}'.format(
@@ -50,8 +57,10 @@ def test_python():
 @inside_docker()
 def test_postgres():
     setup_postgresql()
+    run("service postgresql start")
     with settings(sudo_user="postgres"):
-        assert 2 == sudo('psql -c "select 1 + 1" -A -t')
+        sudo("psql -c 'create user root'")
+    assert '2' == run("psql postgres -c 'select 1 + 1' -A -t")
 
 
 @inside_docker(80)
@@ -62,11 +71,14 @@ def test_utils():
                                         'port': env.contariner_ports[80]}
     page = requests.get(url)
     assert page.status_code == 200
-    assert page.content == '<html>\n<head>\n<title>Welcome to nginx!</title>\n</head>\n<body bgcolor="white" text="black">\n<center><h1>Welcome to nginx!</h1></center>\n</body>\n</html>\n'
 
-    run("screen -v")
-    run("git -v")
-    run("hg -v")
+    run("git --version")
+
+    run("hg --version")
+
+    run("service redis-server start")
     run("redis-cli set foo bar")
-    assert "bar" == run("redis-cli get foo")
+    assert '"bar"' == run("redis-cli get foo")
+
+    run("service supervisor start")
     run("supervisorctl status")
