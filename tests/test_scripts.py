@@ -2,10 +2,15 @@ import paramiko
 import requests
 from fabric.api import settings, local, run, env, sudo
 
-from fabfile import setup_python, setup_postgresql, setup_utils
-
+from fabfile import *
 
 paramiko.util.log_to_file("ssh.log")
+
+
+def generate_username():
+    chars = string.letters
+    length = 8
+    return ''.join(choice(chars) for _ in range(length))
 
 
 def build_container():
@@ -29,15 +34,15 @@ def inside_docker(*ports):
                     apt_cache))
             get_port = lambda p: docker('port {0} {1}'.format(
                 container, p)).split(":")[1]
-            contariner_ports = {p: get_port(p) for p in all_ports}
+            container_ports = {p: get_port(p) for p in all_ports}
             container_host = '%(user)s@%(host)s:%(port)s' % {
                 'user': 'root',
                 'host': '127.0.0.1',
-                'port': contariner_ports[22]}
+                'port': container_ports[22]}
             try:
                 with settings(host_string=container_host,
                               passwords={container_host: 'screencast'},
-                              contariner_ports=contariner_ports):
+                              container_ports=container_ports):
                     fn(*args, **kwargs)
             finally:
                 docker('kill %s' % container)
@@ -68,7 +73,7 @@ def test_utils():
     setup_utils()
     run("service nginx start")
     url = "http://%(host)s:%(port)s" % {'host': '127.0.0.1',
-                                        'port': env.contariner_ports[80]}
+                                        'port': env.container_ports[80]}
     page = requests.get(url)
     assert page.status_code == 200
 
@@ -82,3 +87,40 @@ def test_utils():
 
     run("service supervisor start")
     run("supervisorctl status")
+
+
+@inside_docker()
+def test_upload_rsa():
+    upload_rsa()
+    with settings(passwords=None):
+        assert run("whoami") == "root"
+
+
+@inside_docker()
+def test_create_user():
+    setup_python()
+    user = generate_username()
+    create_user(user)
+    container_host = '%(user)s@%(host)s:%(port)s' % {
+        'user': user,
+        'host': '127.0.0.1',
+        'port': env.container_ports[22]}
+
+    with settings(host_string=container_host,
+                  passwords={}):
+        assert run("whoami") == user
+
+
+@inside_docker()
+def test_deploy():
+    user = generate_username()
+    setup_all()
+    run("service postgresql start")
+    create_project(user)
+    container_host = '%(user)s@%(host)s:%(port)s' % {
+        'user': user,
+        'host': '127.0.0.1',
+        'port': env.container_ports[22]}
+    with settings(host_string=container_host,
+                  passwords={}):
+        assert '2' == run("psql {0} -c 'select 1 + 1' -A -t".format(user))

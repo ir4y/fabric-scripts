@@ -12,9 +12,9 @@ TODO
 [\_] Split `create_database` to `create_database_user` and `create_database`  
 [\_] Add `create_site` wich should accept `user` and `git repo` params and deploy repo  
 [X] ~~Add packet cache for decrease test time (disable downloading) (maybe mount local dir to packet cache dir)~~  
-[\_] Add tests for all tasks  
+[X] ~~Add tests for all tasks~~  
 [X] ~~Use castom Dockerfile with updated ubuntu 14.04~~  
-[\_] Fix apt-get cache autoclean  
+[X] ~~Fix apt-get cache autoclean~~  
 [\_] Add travis integration (https://github.com/lukecyca/travis-docker-example)  
 
 Tests

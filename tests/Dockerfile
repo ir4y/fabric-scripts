@@ -12,6 +12,7 @@ RUN apt-get install -y openssh-server
 RUN mkdir /var/run/sshd 
 RUN echo 'root:screencast' | chpasswd
 ADD sshd_config /etc/ssh/sshd_config
+RUN rm /etc/apt/apt.conf.d/docker-clean
 
 EXPOSE 22
 CMD    /usr/sbin/sshd -D

@@ -45,17 +45,17 @@ POSTGRESQL_PACKAGES = [
 
 
 def setup_python():
-    run("apt-get -y --force-yes install {0}".format(
+    run("apt-get -y install {0}".format(
         " ".join(PYTHON_PACKAGES)))
 
 
 def setup_postgresql():
-    run("apt-get -y --force-yes install {0}".format(
+    run("apt-get -y install {0}".format(
         " ".join(POSTGRESQL_PACKAGES)))
 
 
 def setup_utils():
-    run("apt-get -y --force-yes install {0}".format(
+    run("apt-get -y install {0}".format(
         " ".join(UTILS_PACKAGES)))
 
 
