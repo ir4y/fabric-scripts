@@ -15,7 +15,7 @@ TODO
 [X] ~~Add tests for all tasks~~  
 [X] ~~Use castom Dockerfile with updated ubuntu 14.04~~  
 [X] ~~Fix apt-get cache autoclean~~  
-[\_] Add travis integration (https://github.com/lukecyca/travis-docker-example)  
+[X] ~~Add travis integration~~  
 
 Tests
 ----- 

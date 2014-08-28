@@ -1,0 +1,12 @@
+install:
+  - sudo pip install -r tests/deps.txt
+  - mkdir -p ~/.ssh
+  - ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ""
+  - curl -sSL https://get.docker.io/ubuntu/ | sudo sh
+  - sudo ln -s /usr/bin/docker /usr/bin/docker.io
+  - sudo apt-get install -y slirp
+  - curl -sLo linux https://github.com/jpetazzo/sekexe/raw/master/uml
+  - chmod +x linux
+
+script:
+  - sudo ./linux quiet mem=2G rootfstype=hostfs rw eth0=slirp,,/usr/bin/slirp-fullbolt init=$(pwd)/travis_docker_run.sh WORKDIR=$(pwd) HOME=$HOME
