@@ -10,7 +10,7 @@ paramiko.util.log_to_file("ssh.log")
 def generate_username():
     chars = string.letters
     length = 8
-    return ''.join(choice(chars) for _ in range(length))
+    return ''.join(choice(chars) for _ in range(length)).lower()
 
 
 def build_container():
