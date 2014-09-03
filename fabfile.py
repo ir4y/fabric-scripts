@@ -59,6 +59,28 @@ def setup_utils():
         " ".join(UTILS_PACKAGES)))
 
 
+def setup_nvm():
+    run("wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.15.0/install.sh | bash")
+    run("source ~/.nvm/nvm.sh")
+    run("nvm install 0.10")
+
+
+def setup_node_deps(path):
+    with cd(path):
+        run("nvm use 0.10; npm install -g gulp bower")
+        run("nvm use 0.10; npm install")
+        run("nvm use 0.10; bower install -f")
+
+
+def setup_python_deps(path):
+    with cd(path):
+        run("pip install -r requirements.txt")
+
+
+def setup_all_deps(path):
+    setup_node_deps(path)
+    setup_python_deps(path)
+
 def setup_all():
     setup_utils()
     setup_python()
