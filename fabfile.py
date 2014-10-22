@@ -144,6 +144,7 @@ def create_nginx_host(host):
     server_name {0}.ru;
     # no security problem here, since / is alway passed to upstream
     root /usr/share/nginx/www/{0};
+    client_max_body_size 100m;
     # serve directly - analogous for static/staticfiles
     location /media/ {{
         # if asset versioning is used
