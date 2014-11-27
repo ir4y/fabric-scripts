@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from os import environ, path
 
 import string
-from fabric.api import run, sudo, settings, cd
+from fabric.api import run, sudo, settings, cd, prefix
 from fabric.contrib.files import append
 from random import choice
 
@@ -66,10 +66,10 @@ def setup_nvm():
 
 
 def setup_node_deps(path):
-    with cd(path):
-        run("nvm use 0.10; npm install -g gulp bower grunt-cli less")
-        run("nvm use 0.10; npm install")
-        run("nvm use 0.10; bower install -f")
+    with cd(path), prefix("nvm use 0.10"):
+        run("npm install -g gulp bower grunt-cli less")
+        run("npm install")
+        run("bower install -f")
 
 
 def setup_python_deps(path):
@@ -98,14 +98,13 @@ def create_project(user):
 
 def create_user(user):
     run("useradd -s /bin/bash -m {0}".format(user))
-    with settings(sudo_user=user):
-        with cd("/home/{0}".format(user)):
-            upload_rsa(user=user, use_sudo=True)
-            sudo("virtualenv ./")
-            append(".bashrc", "source ~/bin/activate", use_sudo=True)
-            sudo("mkdir -p sites/{0}".format(user))
-            sudo("mkdir -p var/run")
-            sudo("mkdir -p var/log")
+    with settings(sudo_user=user), cd("/home/{0}".format(user)):
+        upload_rsa(user=user, use_sudo=True)
+        sudo("virtualenv ./")
+        append(".bashrc", "source ~/bin/activate", use_sudo=True)
+        sudo("mkdir -p sites/{0}".format(user))
+        sudo("mkdir -p var/run")
+        sudo("mkdir -p var/log")
 
 
 def generate_password():
