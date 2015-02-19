@@ -176,3 +176,24 @@ def create_nginx_host(host):
         host))
     run("ln -s /home/{0}/sites/{0}/static  /usr/share/nginx/www/{0}".format(
         host))
+
+def create_nginx_static_host(host, path=None):
+    if path is None:
+        path = "/usr/share/nginx/www/{0}".format(host)
+
+    append("/etc/nginx/sites-available/{0}".format(host),
+           """server {{
+    listen   80;
+    server_name {0};
+    client_max_body_size 100m;
+
+    location / {{
+
+        root {1};
+        # if asset versioning is used
+        if ($query_string) {{
+            expires max;
+        }}
+    }}
+    error_page 500 502 503 504 /usr/share/nginx/www/50x.html;
+}}""".format(host, path))
