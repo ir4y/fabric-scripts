@@ -2,17 +2,15 @@
 #
 # VERSION               0.0.1
 
-FROM  ubuntu:14.04
+FROM  baseimage:0.9.16
 
 MAINTAINER Ilya Beda "ir4y.ix@gmail.com"
 
-RUN apt-get update
-
-RUN apt-get install -y openssh-server
-RUN mkdir /var/run/sshd 
-RUN echo 'root:screencast' | chpasswd
+RUN rm -f /etc/service/sshd/down
 ADD sshd_config /etc/ssh/sshd_config
-RUN rm /etc/apt/apt.conf.d/docker-clean
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+RUN echo 'root:screencast' | chpasswd
 
 EXPOSE 22
 CMD    /usr/sbin/sshd -D
