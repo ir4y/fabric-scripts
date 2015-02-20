@@ -62,7 +62,7 @@ def test_python():
 @inside_docker()
 def test_postgres():
     setup_postgresql()
-    run("service postgresql start")
+    run("service postgresql start", pty=False)
     with settings(sudo_user="postgres"):
         sudo("psql -c 'create user root'")
     assert '2' == run("psql postgres -c 'select 1 + 1' -A -t")
@@ -71,7 +71,7 @@ def test_postgres():
 @inside_docker(80)
 def test_utils():
     setup_utils()
-    run("service nginx start")
+    run("service nginx start", pty=False)
     url = "http://%(host)s:%(port)s" % {'host': '127.0.0.1',
                                         'port': env.container_ports[80]}
     page = requests.get(url)
@@ -81,11 +81,11 @@ def test_utils():
 
     run("hg --version")
 
-    run("service redis-server start")
+    run("service redis-server start", pty=False)
     run("redis-cli set foo bar")
     assert '"bar"' == run("redis-cli get foo")
 
-    run("service supervisor start")
+    run("service supervisor start", pty=False)
     run("supervisorctl status")
 
 
@@ -115,7 +115,7 @@ def test_create_user():
 def test_deploy():
     user = generate_username()
     setup_all()
-    run("service postgresql start")
+    run("service postgresql start", pty=False)
     create_project(user)
     container_host = '%(user)s@%(host)s:%(port)s' % {
         'user': user,
