@@ -2,15 +2,8 @@ install:
   - sudo pip install -r tests/deps.txt
   - mkdir -p ~/.ssh
   - ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ""
-  - wget http://get.docker.io/ubuntu/pool/main/l/lxc-docker-1.4.1/lxc-docker-1.4.1_1.4.1_amd64.deb
-  - sudo dpkg -i lxc-docker-1.4.1_1.4.1_amd64.deb
-  - sudo apt-get -fy install
-  - sudo apt-get -y install cgroup-lite
+  - curl -sLo - https://github.com/moul/travis-docker/raw/master/install.sh | sh -xe
   - sudo ln -s /usr/bin/docker /usr/bin/docker.io
-  - sudo apt-get install -y slirp
-  - curl -sLo linux https://github.com/jpetazzo/sekexe/raw/master/uml
-  - chmod +x linux
 
 script:
-  - sudo ./linux quiet mem=2G rootfstype=hostfs rw eth0=slirp,,/usr/bin/slirp-fullbolt init=$(pwd)/travis_docker_run.sh WORKDIR=$(pwd) HOME=$HOME
-  - return `cat build_result`
+  - ./run py.test -s
