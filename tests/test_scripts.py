@@ -27,11 +27,9 @@ def inside_docker(*ports):
             build_container()  # move to setUp
             all_ports = (22, ) + ports
             port_options = " ".join("-p {0}".format(p) for p in all_ports)
-            apt_cache = "-v /var/cache/apt/archives:/var/cache/apt/archives"
             container = docker(
-                'run -d {0} {1} fab-test-ubuntu /usr/sbin/sshd -D'.format(
-                    port_options,
-                    apt_cache))
+                'run -d {0} fab-test-ubuntu /usr/sbin/sshd -D'.format(
+                    port_options))
             get_port = lambda p: docker('port {0} {1}'.format(
                 container, p)).split(":")[1]
             container_ports = {p: get_port(p) for p in all_ports}
