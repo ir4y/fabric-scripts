@@ -2,7 +2,9 @@ install:
   - sudo pip install -r tests/deps.txt
   - mkdir -p ~/.ssh
   - ssh-keygen -t rsa -f ~/.ssh/id_rsa -q -N ""
-  - curl -sSL https://get.docker.io/ubuntu/ | sudo sh
+  - wget http://get.docker.io/ubuntu/pool/main/l/lxc-docker-1.4.1/lxc-docker-1.4.1_1.4.1_amd64.deb
+  - sudo dpkg -i lxc-docker-1.4.1_1.4.1_amd64.deb
+  - sudo apt-get -fy install
   - sudo ln -s /usr/bin/docker /usr/bin/docker.io
   - sudo apt-get install -y slirp
   - curl -sLo linux https://github.com/jpetazzo/sekexe/raw/master/uml
