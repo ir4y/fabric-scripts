@@ -63,4 +63,5 @@ docker -d &
 sleep 5
 
 # Run tests
-exec py.test -s
+py.test -s
+echo $? > build_result
