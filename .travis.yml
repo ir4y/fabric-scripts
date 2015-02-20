@@ -7,3 +7,4 @@ install:
 
 script:
   - ./run py.test -s
+  - return $(cat .exit_code)
