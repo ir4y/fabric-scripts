@@ -6,6 +6,5 @@ install:
   - sudo ln -s /usr/bin/docker /usr/bin/docker.io
 script:
   - ./run py.test -s --cov fabfile.py
-  - return $(cat .exit_code)
 after_success:
       coveralls
