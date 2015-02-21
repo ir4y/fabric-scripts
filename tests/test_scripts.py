@@ -122,6 +122,3 @@ def test_deploy():
     with settings(host_string=container_host,
                   passwords={}):
         assert '2' == run("psql {0} -c 'select 1 + 1' -A -t".format(user))
-
-def test_fail():
-    assert False
