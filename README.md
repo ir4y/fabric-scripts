@@ -1,7 +1,4 @@
-# fabric scripts  
-[![Build status: Error](https://api.travis-ci.org/ir4y/fabric-scripts.svg?branch=master)](https://travis-ci.org/ir4y/fabric-scripts/)
-[![Health status: Error](https://landscape.io/github/ir4y/fabric-scripts/master/landscape.svg?style=flat)](https://landscape.io/github/ir4y/fabric-scripts)
-[![Coverage Status](https://img.shields.io/coveralls/ir4y/fabric-scripts.svg)](https://coveralls.io/r/ir4y/fabric-scripts)
+# fabric scripts  [![Build status: Error](https://api.travis-ci.org/ir4y/fabric-scripts.svg?branch=master)](https://travis-ci.org/ir4y/fabric-scripts/)[![Health status: Error](https://landscape.io/github/ir4y/fabric-scripts/master/landscape.svg?style=flat)](https://landscape.io/github/ir4y/fabric-scripts)[![Coverage Status](https://img.shields.io/coveralls/ir4y/fabric-scripts.svg)](https://coveralls.io/r/ir4y/fabric-scripts)  
 Tools for fast python app deployement with nginx, supervisord and postgres.
 
 
