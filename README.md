@@ -1,4 +1,4 @@
-fabric scripts  [![Build status: Error](https://api.travis-ci.org/ir4y/fabric-scripts.svg)](https://travis-ci.org/ir4y/fabric-scripts/)
+fabric scripts  [![Build status: Error](https://api.travis-ci.org/ir4y/fabric-scripts.svg?branch=master)](https://travis-ci.org/ir4y/fabric-scripts/)
 ==============
 Tools for fast python app deployement with nginx, supervisord and postgres.
 
