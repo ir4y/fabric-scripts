@@ -61,8 +61,8 @@ def setup_utils():
 
 def setup_nvm():
     run("wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.15.0/install.sh | bash")
-    run("source ~/.nvm/nvm.sh")
-    run("nvm install 0.10")
+    with prefix("source ~/.nvm/nvm.sh"):
+        run("nvm install 0.10")
 
 
 def setup_node_deps(path):
