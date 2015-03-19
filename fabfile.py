@@ -190,6 +190,7 @@ def create_nginx_static_host(host, path=None):
     location / {{
 
         root {1};
+        try_files $uri $uri/ /index.html;
         # if asset versioning is used
         if ($query_string) {{
             expires max;
