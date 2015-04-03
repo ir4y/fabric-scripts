@@ -100,6 +100,8 @@ def create_user(user):
     run("useradd -s /bin/bash -m {0}".format(user))
     with settings(sudo_user=user), cd("/home/{0}".format(user)):
         upload_rsa(user=user, use_sudo=True)
+        sudo('ssh-keygen -t rsa -N "" -f ~{0}/.ssh/id_rsa'.format(user))
+        sudo("cat ~{0}/.ssh/id_rsa.pub".format(user))
         sudo("virtualenv ./")
         append(".bashrc", "source ~/bin/activate", use_sudo=True)
         sudo("mkdir -p sites/{0}".format(user))
