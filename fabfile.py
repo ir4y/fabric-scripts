@@ -35,6 +35,8 @@ PYTHON_PACKAGES = [
     "gcc",
     "make",
     "libjpeg-dev",
+    "libxml2-dev",
+    "libxslt1-dev",
     "libcurl4-openssl-dev",
 ]
 
