@@ -50,6 +50,7 @@ def setup_python():
 
 
 def setup_postgresql():
+    run("locale-gen ru_RU.UTF-8")
     run("apt-get -y install {0}".format(
         " ".join(POSTGRESQL_PACKAGES)))
 
