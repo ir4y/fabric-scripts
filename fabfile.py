@@ -92,20 +92,20 @@ def setup_all():
     setup_postgresql()
 
 
-def create_project(user):
-    create_user(user)
+def create_project(user, python='/usr/bin/python2'):
+    create_user(user, python=python)
     create_database(user)
     create_gunicorn_supervisor(user)
     create_nginx_host(user)
 
 
-def create_user(user):
+def create_user(user, python='/usr/bin/python2'):
     run("useradd -s /bin/bash -m {0}".format(user))
     with settings(sudo_user=user), cd("/home/{0}".format(user)):
         upload_rsa(user=user, use_sudo=True)
         sudo('ssh-keygen -t rsa -N "" -f ~{0}/.ssh/id_rsa'.format(user))
         sudo("cat ~{0}/.ssh/id_rsa.pub".format(user))
-        sudo("virtualenv ./")
+        sudo("virtualenv -p {0} ./".format(python))
         append(".bashrc", "source ~/bin/activate", use_sudo=True)
         sudo("mkdir -p sites/{0}".format(user))
         sudo("mkdir -p var/run")
